@@ -1,0 +1,24 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  namespace: default
+  name: trades-aggregator
+spec:
+  image: trades-aggregator
+  imagePullPolicy: Never
+  serviceAccount: flink
+  flinkVersion: v1_15
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "1"
+  jobManager:
+    resource:
+      memory: "1048m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "1048m"
+      cpu: 1
+  job:
+    jarURI: local:///opt/flink/usrlib/binance-api-stream-processor_2.12-0.1.0.jar
+    args: ["--kafka-brokers", "kafka:9092"]
+    parallelism: 1

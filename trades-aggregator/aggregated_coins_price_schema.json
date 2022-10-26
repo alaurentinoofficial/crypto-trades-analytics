@@ -1,0 +1,48 @@
+{
+  "schemaName": "aggregated_coins_price",
+  "dimensionFieldSpecs": [
+    {
+      "name": "symbol",
+      "dataType": "STRING",
+      "singleValueField": true
+    }
+  ],
+  "metricFieldSpecs": [
+    {
+      "name": "price",
+      "dataType": "DOUBLE"
+    },
+    {
+      "name": "minPrice",
+      "dataType": "DOUBLE"
+    },
+    {
+      "name": "maxPrice",
+      "dataType": "DOUBLE"
+    },
+    {
+      "name": "tradesQuantity",
+      "dataType": "INT"
+    }
+  ],
+  "dateTimeFieldSpecs": [
+    {
+      "name": "partitionTs",
+      "dataType": "TIMESTAMP",
+      "format": "1:MILLISECONDS:EPOCH",
+      "granularity": "1:SECONDS"
+    },
+    {
+      "name": "startTs",
+      "dataType": "TIMESTAMP",
+      "format": "1:MILLISECONDS:EPOCH",
+      "granularity": "1:SECONDS"
+    },
+    {
+      "name": "endTs",
+      "dataType": "TIMESTAMP",
+      "format": "1:MILLISECONDS:EPOCH",
+      "granularity": "1:SECONDS"
+    }
+  ]
+}

@@ -1,0 +1,643 @@
+---
+# Source: flink-kubernetes-operator/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flink-operator
+  namespace: default
+  labels:
+    app.kubernetes.io/name: flink-kubernetes-operator
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: flink-kubernetes-operator-1.2.0
+---
+# Source: flink-kubernetes-operator/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flink
+  namespace: default
+  labels:
+    app.kubernetes.io/name: flink-kubernetes-operator
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: flink-kubernetes-operator-1.2.0
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: flink-kubernetes-operator/templates/webhook.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flink-operator-webhook-secret
+  namespace: default
+type: Opaque
+data:
+  password: cGFzc3dvcmQxMjM0
+---
+# Source: flink-kubernetes-operator/templates/flink-operator.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flink-operator-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: flink-kubernetes-operator
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: flink-kubernetes-operator-1.2.0
+data:
+  flink-conf.yaml: |+
+    ################################################################################
+    #  Licensed to the Apache Software Foundation (ASF) under one
+    #  or more contributor license agreements.  See the NOTICE file
+    #  distributed with this work for additional information
+    #  regarding copyright ownership.  The ASF licenses this file
+    #  to you under the Apache License, Version 2.0 (the
+    #  "License"); you may not use this file except in compliance
+    #  with the License.  You may obtain a copy of the License at
+    #
+    #      http://www.apache.org/licenses/LICENSE-2.0
+    #
+    #  Unless required by applicable law or agreed to in writing, software
+    #  distributed under the License is distributed on an "AS IS" BASIS,
+    #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    #  See the License for the specific language governing permissions and
+    # limitations under the License.
+    ################################################################################
+    
+    # Flink job/cluster related configs
+    taskmanager.numberOfTaskSlots: 2
+    parallelism.default: 2
+    
+    # Flink operator related configs
+    # kubernetes.operator.reconcile.interval: 60 s
+    # kubernetes.operator.reconcile.parallelism: 5
+    # kubernetes.operator.flink.client.cancel.timeout: 1 min
+    # kubernetes.operator.resource.cleanup.timeout: 60 s
+    # kubernetes.operator.observer.rest-ready.delay: 10 s
+    # kubernetes.operator.observer.progress-check.interval: 10 s
+    # kubernetes.operator.observer.savepoint.trigger.grace-period: 10 s
+    # kubernetes.operator.flink.client.timeout: 10 s
+    # kubernetes.operator.deployment.rollback.enabled: false
+    # kubernetes.operator.deployment.readiness.timeout: 1min
+    # kubernetes.operator.user.artifacts.base.dir: /opt/flink/artifacts
+    # kubernetes.operator.job.upgrade.ignore-pending-savepoint: false
+    # kubernetes.operator.watched.namespaces: ns1,ns2
+    # kubernetes.operator.label.selector: flink=enabled
+    # kubernetes.operator.dynamic.namespaces.enabled: false
+    # kubernetes.operator.retry.initial.interval: 5 s
+    # kubernetes.operator.retry.interval.multiplier: 2
+    # kubernetes.operator.retry.max.attempts: 10
+    
+    # kubernetes.operator.metrics.reporter.slf4j.factory.class: org.apache.flink.metrics.slf4j.Slf4jReporterFactory
+    # kubernetes.operator.metrics.reporter.slf4j.interval: 5 MINUTE
+    
+    # Flink Config Overrides
+    kubernetes.operator.metrics.reporter.slf4j.factory.class: org.apache.flink.metrics.slf4j.Slf4jReporterFactory
+    kubernetes.operator.metrics.reporter.slf4j.interval: 5 MINUTE
+    
+    kubernetes.operator.reconcile.interval: 15 s
+    kubernetes.operator.observer.progress-check.interval: 5 s
+    
+    kubernetes.operator.health.probe.enabled: true
+    kubernetes.operator.health.probe.port: 8085
+  log4j-operator.properties: |+
+    ################################################################################
+    #  Licensed to the Apache Software Foundation (ASF) under one
+    #  or more contributor license agreements.  See the NOTICE file
+    #  distributed with this work for additional information
+    #  regarding copyright ownership.  The ASF licenses this file
+    #  to you under the Apache License, Version 2.0 (the
+    #  "License"); you may not use this file except in compliance
+    #  with the License.  You may obtain a copy of the License at
+    #
+    #      http://www.apache.org/licenses/LICENSE-2.0
+    #
+    #  Unless required by applicable law or agreed to in writing, software
+    #  distributed under the License is distributed on an "AS IS" BASIS,
+    #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    #  See the License for the specific language governing permissions and
+    # limitations under the License.
+    ################################################################################
+    
+    rootLogger.level = INFO
+    rootLogger.appenderRef.console.ref = ConsoleAppender
+    
+    # Log all infos to the console
+    appender.console.name = ConsoleAppender
+    appender.console.type = CONSOLE
+    appender.console.layout.type = PatternLayout
+    appender.console.layout.pattern = %style{%d}{yellow} %style{%-30c{1.}}{cyan} %highlight{[%-5level]%notEmpty{[%X{resource.namespace}/}%notEmpty{%X{resource.name}]} %msg%n%throwable}
+    
+    # Do not log config loading
+    logger.conf.name = org.apache.flink.configuration.GlobalConfiguration
+    logger.conf.level = WARN
+    
+    # Flink Operator Logging Overrides
+    # rootLogger.level = DEBUG
+    # logger.operator.name= org.apache.flink.kubernetes.operator
+    # logger.operator.level = DEBUG
+    
+  log4j-console.properties: |+
+    ################################################################################
+    #  Licensed to the Apache Software Foundation (ASF) under one
+    #  or more contributor license agreements.  See the NOTICE file
+    #  distributed with this work for additional information
+    #  regarding copyright ownership.  The ASF licenses this file
+    #  to you under the Apache License, Version 2.0 (the
+    #  "License"); you may not use this file except in compliance
+    #  with the License.  You may obtain a copy of the License at
+    #
+    #      http://www.apache.org/licenses/LICENSE-2.0
+    #
+    #  Unless required by applicable law or agreed to in writing, software
+    #  distributed under the License is distributed on an "AS IS" BASIS,
+    #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    #  See the License for the specific language governing permissions and
+    # limitations under the License.
+    ################################################################################
+    
+    # This affects logging for both user code and Flink
+    rootLogger.level = INFO
+    rootLogger.appenderRef.console.ref = ConsoleAppender
+    rootLogger.appenderRef.rolling.ref = RollingFileAppender
+    
+    # Uncomment this if you want to _only_ change Flink's logging
+    #logger.flink.name = org.apache.flink
+    #logger.flink.level = INFO
+    
+    # The following lines keep the log level of common libraries/connectors on
+    # log level INFO. The root logger does not override this. You have to manually
+    # change the log levels here.
+    logger.akka.name = akka
+    logger.akka.level = INFO
+    logger.kafka.name= org.apache.kafka
+    logger.kafka.level = INFO
+    logger.hadoop.name = org.apache.hadoop
+    logger.hadoop.level = INFO
+    logger.zookeeper.name = org.apache.zookeeper
+    logger.zookeeper.level = INFO
+    
+    # Log all infos to the console
+    appender.console.name = ConsoleAppender
+    appender.console.type = CONSOLE
+    appender.console.layout.type = PatternLayout
+    appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+    
+    # Log all infos in the given rolling file
+    appender.rolling.name = RollingFileAppender
+    appender.rolling.type = RollingFile
+    appender.rolling.append = false
+    appender.rolling.fileName = ${sys:log.file}
+    appender.rolling.filePattern = ${sys:log.file}.%i
+    appender.rolling.layout.type = PatternLayout
+    appender.rolling.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+    appender.rolling.policies.type = Policies
+    appender.rolling.policies.size.type = SizeBasedTriggeringPolicy
+    appender.rolling.policies.size.size=100MB
+    appender.rolling.strategy.type = DefaultRolloverStrategy
+    appender.rolling.strategy.max = 10
+    
+    # Suppress the irrelevant (wrong) warnings from the Netty channel handler
+    logger.netty.name = org.apache.flink.shaded.akka.org.jboss.netty.channel.DefaultChannelPipeline
+    logger.netty.level = OFF
+    
+    # Flink Deployment Logging Overrides
+    # rootLogger.level = DEBUG
+---
+# Source: flink-kubernetes-operator/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flink-operator
+  namespace: default
+  labels:
+    app.kubernetes.io/name: flink-kubernetes-operator
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: flink-kubernetes-operator-1.2.0
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - services
+      - events
+      - configmaps
+      - secrets
+    verbs:
+      - "*"
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - deployments/finalizers
+      - replicasets
+    verbs:
+      - "*"
+  - apiGroups:
+      - extensions
+    resources:
+      - deployments
+      - ingresses
+    verbs:
+      - "*"
+  - apiGroups:
+      - flink.apache.org
+    resources:
+      - flinkdeployments
+      - flinkdeployments/status
+      - flinksessionjobs
+      - flinksessionjobs/status
+    verbs:
+      - "*"
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - "*"
+---
+# Source: flink-kubernetes-operator/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: flink-operator-role-binding
+  namespace: default
+  labels:
+    app.kubernetes.io/name: flink-kubernetes-operator
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: flink-kubernetes-operator-1.2.0
+roleRef:
+  kind: ClusterRole
+  name: flink-operator
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: flink-operator
+    namespace: default
+---
+# Source: flink-kubernetes-operator/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: flink
+  namespace: default
+  labels:
+    app.kubernetes.io/name: flink-kubernetes-operator
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: flink-kubernetes-operator-1.2.0
+  annotations:
+    "helm.sh/resource-policy": keep
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - configmaps
+    verbs:
+      - '*'
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - deployments/finalizers
+    verbs:
+      - '*'
+---
+# Source: flink-kubernetes-operator/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: flink-role-binding
+  namespace: default
+  labels:
+    app.kubernetes.io/name: flink-kubernetes-operator
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: flink-kubernetes-operator-1.2.0
+  annotations:
+    "helm.sh/resource-policy": keep
+roleRef:
+  kind: Role
+  name: flink
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: flink
+    namespace: default
+---
+# Source: flink-kubernetes-operator/templates/webhook.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flink-operator-webhook-service
+  namespace: default
+spec:
+  ports:
+  - port: 443
+    targetPort: 9443
+  selector:
+    app.kubernetes.io/name: flink-kubernetes-operator
+---
+# Source: flink-kubernetes-operator/templates/flink-operator.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-kubernetes-operator
+  namespace: default
+  labels:
+    app.kubernetes.io/name: flink-kubernetes-operator
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: flink-kubernetes-operator-1.2.0
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: flink-kubernetes-operator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: flink-kubernetes-operator
+      annotations:
+        kubectl.kubernetes.io/default-container: flink-kubernetes-operator
+    spec:
+      securityContext:
+        runAsGroup: 9999
+        runAsUser: 9999
+      serviceAccountName: flink-operator
+      containers:
+        - name: flink-kubernetes-operator
+          image: "ghcr.io/apache/flink-kubernetes-operator:95128bf"
+          imagePullPolicy: IfNotPresent
+          command: ["/docker-entrypoint.sh", "operator"]
+          ports:
+            - containerPort: 8085
+              name: health-port
+              protocol: TCP
+          env:
+            - name: OPERATOR_NAMESPACE
+              value: default
+            - name: OPERATOR_NAME
+              value: flink-kubernetes-operator
+            - name: FLINK_CONF_DIR
+              value: /opt/flink/conf
+            - name: FLINK_PLUGINS_DIR
+              value: /opt/flink/plugins
+            - name: LOG_CONFIG
+              value: -Dlog4j.configurationFile=/opt/flink/conf/log4j-operator.properties
+            - name: JVM_ARGS
+              value: 
+          securityContext:
+            {}
+          volumeMounts:
+            - name: flink-operator-config-volume
+              mountPath: /opt/flink/conf/flink-conf.yaml
+              subPath: flink-conf.yaml
+            - name: flink-operator-config-volume
+              mountPath: /opt/flink/conf/log4j-operator.properties
+              subPath: log4j-operator.properties
+            - name: flink-operator-config-volume
+              mountPath: /opt/flink/conf/log4j-console.properties
+              subPath: log4j-console.properties
+          livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            httpGet:
+              path: /
+              port: health-port
+          startupProbe:
+            failureThreshold: 30
+            periodSeconds: 10
+            httpGet:
+              path: /
+              port: health-port
+        - name: flink-webhook
+          image: "ghcr.io/apache/flink-kubernetes-operator:95128bf"
+          imagePullPolicy: IfNotPresent
+          command: ["/docker-entrypoint.sh", "webhook"]
+          env:
+            - name: WEBHOOK_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: flink-operator-webhook-secret
+                  key: password
+            - name: WEBHOOK_KEYSTORE_FILE
+              value: "/certs/keystore.p12"
+            - name: WEBHOOK_KEYSTORE_TYPE
+              value: "pkcs12"
+            - name: WEBHOOK_SERVER_PORT
+              value: "9443"
+            - name: LOG_CONFIG
+              value: -Dlog4j.configurationFile=/opt/flink/conf/log4j-operator.properties
+            - name: JVM_ARGS
+              value: 
+            - name: FLINK_CONF_DIR
+              value: /opt/flink/conf
+            - name: FLINK_PLUGINS_DIR
+              value: /opt/flink/plugins
+            - name: OPERATOR_NAMESPACE
+              value: default
+          securityContext:
+            {}
+          volumeMounts:
+          - name: keystore
+            mountPath: "/certs"
+            readOnly: true
+          - name: flink-operator-config-volume
+            mountPath: /opt/flink/conf/flink-conf.yaml
+            subPath: flink-conf.yaml
+          - name: flink-operator-config-volume
+            mountPath: /opt/flink/conf/log4j-operator.properties
+            subPath: log4j-operator.properties
+          - name: flink-operator-config-volume
+            mountPath: /opt/flink/conf/log4j-console.properties
+            subPath: log4j-console.properties
+      volumes:
+        - name: flink-operator-config-volume
+          configMap:
+            name: flink-operator-config
+            items:
+              - key: flink-conf.yaml
+                path: flink-conf.yaml
+              - key: log4j-operator.properties
+                path: log4j-operator.properties
+              - key: log4j-console.properties
+                path: log4j-console.properties
+        - name: keystore
+          secret:
+            secretName: webhook-server-cert
+            items:
+            - key: keystore.p12
+              path: keystore.p12
+---
+# Source: flink-kubernetes-operator/templates/flink-operator.yaml
+################################################################################
+#  Licensed to the Apache Software Foundation (ASF) under one
+#  or more contributor license agreements.  See the NOTICE file
+#  distributed with this work for additional information
+#  regarding copyright ownership.  The ASF licenses this file
+#  to you under the Apache License, Version 2.0 (the
+#  "License"); you may not use this file except in compliance
+#  with the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+---
+# Source: flink-kubernetes-operator/templates/rbac.yaml
+################################################################################
+#  Licensed to the Apache Software Foundation (ASF) under one
+#  or more contributor license agreements.  See the NOTICE file
+#  distributed with this work for additional information
+#  regarding copyright ownership.  The ASF licenses this file
+#  to you under the Apache License, Version 2.0 (the
+#  "License"); you may not use this file except in compliance
+#  with the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+---
+# Source: flink-kubernetes-operator/templates/rbac.yaml
+---
+---
+# Source: flink-kubernetes-operator/templates/serviceaccount.yaml
+################################################################################
+#  Licensed to the Apache Software Foundation (ASF) under one
+#  or more contributor license agreements.  See the NOTICE file
+#  distributed with this work for additional information
+#  regarding copyright ownership.  The ASF licenses this file
+#  to you under the Apache License, Version 2.0 (the
+#  "License"); you may not use this file except in compliance
+#  with the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+---
+# Source: flink-kubernetes-operator/templates/webhook.yaml
+################################################################################
+#  Licensed to the Apache Software Foundation (ASF) under one
+#  or more contributor license agreements.  See the NOTICE file
+#  distributed with this work for additional information
+#  regarding copyright ownership.  The ASF licenses this file
+#  to you under the Apache License, Version 2.0 (the
+#  "License"); you may not use this file except in compliance
+#  with the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+---
+# Source: flink-kubernetes-operator/templates/webhook.yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: flink-operator-serving-cert
+  namespace: default
+spec:
+  dnsNames:
+  - flink-operator-webhook-service.default.svc
+  - flink-operator-webhook-service.default.svc.cluster.local
+  keystores:
+    pkcs12:
+      create: true
+      passwordSecretRef:
+        name: flink-operator-webhook-secret
+        key: password
+  issuerRef:
+    kind: Issuer
+    name: flink-operator-selfsigned-issuer
+  commonName: FlinkDeployment Validator
+  secretName: webhook-server-cert
+---
+# Source: flink-kubernetes-operator/templates/webhook.yaml
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: flink-operator-selfsigned-issuer
+  namespace: default
+spec:
+  selfSigned: {}
+---
+# Source: flink-kubernetes-operator/templates/webhook.yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: default/flink-operator-serving-cert
+  name: flink-operator-default-webhook-configuration
+webhooks:
+  - name: flinkoperator.flink.apache.org
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      service:
+        name: flink-operator-webhook-service
+        namespace: default
+        path: /mutate
+    failurePolicy: Fail
+    rules:
+      - apiGroups: ["*"]
+        apiVersions: ["*"]
+        scope: "Namespaced"
+        operations:
+          - CREATE
+        resources:
+          - flinksessionjobs
+    sideEffects: None
+---
+# Source: flink-kubernetes-operator/templates/webhook.yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: default/flink-operator-serving-cert
+  name: flink-operator-default-webhook-configuration
+webhooks:
+- name: flinkoperator.flink.apache.org
+  admissionReviewVersions: ["v1"]
+  clientConfig:
+    service:
+      name: flink-operator-webhook-service
+      namespace: default
+      path: /validate
+  failurePolicy: Fail
+  rules:
+  - apiGroups: ["*"]
+    apiVersions: ["*"]
+    scope: "Namespaced"
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - flinkdeployments
+    - flinksessionjobs
+  sideEffects: None
