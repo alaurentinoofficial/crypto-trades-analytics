@@ -1,5 +1,5 @@
 {
-  "schemaName": "aggregated_coins_price",
+  "schemaName": "trades_agg",
   "dimensionFieldSpecs": [
     {
       "name": "symbol",
