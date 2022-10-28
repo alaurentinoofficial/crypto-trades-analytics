@@ -18,10 +18,6 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
 }
 
-//test {
-//    useJUnitPlatform()
-//}
-
 tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "com.something.binancewebsocket.MainKt"

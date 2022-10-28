@@ -11,7 +11,7 @@ import java.util.*
 fun main(args: Array<String>) {
     // Kafka configs
     val properties = Properties()
-    properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:19091")
+    properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092")
     properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java.name)
     properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java.name)
     val producer: KafkaProducer<String, String> = KafkaProducer<String, String>(properties)
@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
     streams.add("ethusdt@trade")
 
     client.combineStreams(streams) { event ->
-        producer.send(ProducerRecord<String, String>("binance_stream_events", event))
+        producer.send(ProducerRecord("binance_stream_events", event))
         println(event)
     }
 }
