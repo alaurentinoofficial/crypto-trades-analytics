@@ -12,6 +12,8 @@ class AggregateTradesByWindow extends WindowFunction[BinanceTradeEvent, AggCoinP
                      window: TimeWindow,
                      elements: Iterable[BinanceTradeEvent],
                      out: Collector[AggCoinPrice]): Unit = {
+    if (elements.isEmpty) return
+    
     var minPrice = -1d
     var maxPrice = -1d
     var count = 0
