@@ -7,7 +7,7 @@ enablePlugins(
 // Versioning
 ThisBuild / version := "0.1.0"
 ThisBuild / scalaVersion := "2.12.10"
-ThisBuild / organization := "com.example"
+ThisBuild / organization := "com.something.tradesaggregator"
 
 // Dependencies
 val flinkVersion = "1.15.2"
@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "org.apache.flink" % "flink-java-examples" % "0.10.2",
   "org.apache.flink" % "flink-connector-kafka" % flinkVersion,
   "org.apache.flink" % "flink-connector-base" % flinkVersion,
+  "org.apache.flink" % "flink-sql-client" % "1.15.2",
   "org.apache.flink" % "flink-clients" % flinkVersion % "provided",
   "org.apache.flink" %% "flink-streaming-scala" % flinkVersion % "provided",
   "org.apache.flink" %% "flink-scala" % flinkVersion % "provided",

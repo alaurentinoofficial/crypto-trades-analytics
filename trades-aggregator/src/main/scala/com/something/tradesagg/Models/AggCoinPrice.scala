@@ -1,4 +1,4 @@
-package com.something.Models
+package com.something.tradesagg.Models
 
 case class AggCoinPrice(symbol: String,
                         price: Double,

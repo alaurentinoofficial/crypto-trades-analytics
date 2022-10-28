@@ -1,8 +1,8 @@
-package com.something
+package com.something.tradesagg
 
 import com.google.gson.Gson
-import com.something.Models._
-import com.something.Processes.AggregateTradesByWindow
+import com.something.tradesagg.Models.{BinanceStream, BinanceTradeEvent}
+import com.something.tradesagg.Processes.AggregateTradesByWindow
 import org.apache.flink.api.common.eventtime.{SerializableTimestampAssigner, WatermarkStrategy}
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.api.java.utils.ParameterTool
@@ -23,7 +23,7 @@ object Main extends App {
 
   val source = KafkaSource.builder()
     .setBootstrapServers(params.get("kafka-brokers", "localhost:19091"))
-    .setTopics("trades_agg")
+    .setTopics("binance_stream_events")
     .setGroupId("binance_trades_events")
     .setStartingOffsets(OffsetsInitializer.latest())
     .setValueOnlyDeserializer(new SimpleStringSchema())
@@ -40,7 +40,7 @@ object Main extends App {
 
   val inputStream = env
     .fromSource(source, WatermarkStrategy.noWatermarks(), "Kafka Source")
-    .map(new Gson().fromJson(_, classOf[BinanceTradeEvent]))
+    .map(new Gson().fromJson(_, classOf[BinanceStream]).data)
 
   val transformStream = inputStream
     .assignTimestampsAndWatermarks(

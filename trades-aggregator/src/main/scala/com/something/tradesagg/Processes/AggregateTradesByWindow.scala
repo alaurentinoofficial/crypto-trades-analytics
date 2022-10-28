@@ -1,11 +1,10 @@
-package com.something.Processes
+package com.something.tradesagg.Processes
 
-import com.something.Models.{BinanceTradeEvent, AggCoinPrice}
+import com.something.tradesagg.Models.{AggCoinPrice, BinanceTradeEvent}
 import org.apache.flink.streaming.api.scala.function._
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 
-import java.time.Instant
 import scala.collection.mutable.ListBuffer
 
 class AggregateTradesByWindow extends WindowFunction[BinanceTradeEvent, AggCoinPrice, String, TimeWindow] {
