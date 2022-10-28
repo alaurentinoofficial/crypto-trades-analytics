@@ -1,9 +1,9 @@
-# Binance Trades Aggregator Dashboard
+# Crypto Trades Analytics
 
 ## Dashboard
 ![Dashboard](./resources/img/dashboard.png)
 
 <br/>
 
-## Architeture
+## Architecture
 ![Architecture](./resources/img/architecture.png)
