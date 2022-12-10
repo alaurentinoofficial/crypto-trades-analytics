@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:alpine-jre AS main
+FROM openjdk:11 AS main
 ENV ARTIFACT_NAME=binance-websocket-0.0.1.jar
 ENV APP_HOME=/app
 
